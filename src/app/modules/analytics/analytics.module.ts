@@ -27,7 +27,7 @@ export class AnalyticsModule {
     return {
       ngModule: AnalyticsModule,
       providers: [
-      //  providedNovaHttpClient,
+        providedNovaHttpClient,
         AnalyticsService,
         AnalyticsClient,
         LocalizationService
