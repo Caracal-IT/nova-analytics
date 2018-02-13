@@ -11,7 +11,10 @@ import {AnalyticsClient} from "./services/analytics.client.service";
   declarations: []
 })
 export class AnalyticsModule {
-  public static forRoot(): ModuleWithProviders {
+  public static forRoot(...configs: Array<any>): ModuleWithProviders {
+    for(let config of configs)
+      AnalyticsService.addEvents(config.getEvents());
+
     return {
       ngModule: AnalyticsModule,
       providers: [
