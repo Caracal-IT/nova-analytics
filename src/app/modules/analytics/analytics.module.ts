@@ -1,23 +1,16 @@
 import {ModuleWithProviders, NgModule, Provider} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {AnalyticsService} from "./services/analytics.service";
-import {LocalizationService} from "./services/localization.service";
-import {AnalyticsClient} from "./services/analytics.client.service";
-import {NovaCoreLibModule, NovaHttpClient} from "nova-core-lib";
 
 @NgModule({
   imports: [
-    CommonModule,
-    NovaCoreLibModule.forRoot()
-  ],
-  declarations: []
+    CommonModule
+  ]
 })
 export class AnalyticsModule {
   public static forRoot(
-    providedNovaHttpClient: Provider = {
-      provide: NovaHttpClient,
-      useClass: NovaHttpClient
-    },
+    providedAnalyticsClient: Provider,
+    providedSpatialClient: Provider,
     ...configs: Array<any>
   ): ModuleWithProviders {
 
@@ -27,10 +20,9 @@ export class AnalyticsModule {
     return {
       ngModule: AnalyticsModule,
       providers: [
-        providedNovaHttpClient,
-        AnalyticsService,
-        AnalyticsClient,
-        LocalizationService
+        providedAnalyticsClient,
+        providedSpatialClient,
+        AnalyticsService
       ]
     };
   }

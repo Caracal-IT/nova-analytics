@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
-import {AnalyticsClient} from "./analytics.client.service";
-import {LocalizationService} from "./localization.service";
+import {AnalyticsClient} from "../clients/analytics.client";
+import {SpatialClient} from "../clients/spatial.client";
+import {GeoLocation} from "../models/spatial/geo-location.type";
 
 @Injectable()
 export class AnalyticsService {
@@ -9,7 +10,7 @@ export class AnalyticsService {
 
   constructor(
     private server: AnalyticsClient,
-    private localization: LocalizationService
+    private spatialClient: SpatialClient
   ){
     this.sessionId = Guid.newGuid();
 
@@ -53,20 +54,10 @@ export class AnalyticsService {
 
     if (event.type == 'load') {
       this
-        .localization
-        .getLocation()
-        .subscribe((geodata: any) => {
-          metric["geo_ip"] = geodata.ip;
-          metric["geo_country_code"] = geodata.country_code;
-          metric["geo_country_name"] = geodata.country_name;
-          metric["geo_region_code"] = geodata.region_code;
-          metric["geo_region_name"] = geodata.region_name;
-          metric["geo_city"] = geodata.city;
-          metric["geo_zip_code"] = geodata.zip_code;
-          metric["geo_time_zone"] = geodata.time_zone;
-          metric["geo_latitude"] = geodata.latitude;
-          metric["geo_longitude"] = geodata.longitude;
-          metric["geo_location"] = `${geodata.latitude}, ${geodata.longitude}`;
+        .spatialClient
+        .getLocationNew()
+        .subscribe((geoLocation: any) => {
+          this.mapGeoLocationFields(metric, geoLocation);
 
           this.saveMetric(metric);
         }, () =>{
@@ -76,6 +67,18 @@ export class AnalyticsService {
     else {
       this.saveMetric(metric);
     }
+  }
+
+  private mapGeoLocationFields(metric: any, geoLocation: GeoLocation) {
+    metric["geo_country_code"] = geoLocation.country.key;
+    metric["geo_country_name"] = geoLocation.country.value;
+    metric["geo_region_code"] = geoLocation.region.key;
+    metric["geo_region_name"] = geoLocation.region.value;
+    metric["geo_city"] = geoLocation.city;
+    metric["geo_time_zone"] = geoLocation.timeZone;
+    metric["geo_latitude"] = geoLocation.latitude;
+    metric["geo_longitude"] = geoLocation.longitude;
+    metric["geo_location"] = `${geoLocation.latitude}, ${geoLocation.longitude}`;
   }
 
   private canLogEvent(event: any, eventDefinition: any){
@@ -93,9 +96,10 @@ export class AnalyticsService {
 
       let values = constraint.values.split(",");
 
-      let isValueInList = values
-        .filter((filter:any) => filter.trim() == value.trim())
-        .length;
+      let isValueInList =
+        values
+          .filter((filter:any) => filter.trim() == value.trim())
+          .length;
 
       if(isValueInList)
         return true;
@@ -144,10 +148,13 @@ export class AnalyticsService {
   }
 
   private saveMetric(metric: any) {
+    /*
     this
       .server
       .indexDocument(metric)
       .subscribe(() => {},(error) => console.log(error));
+      */
+    console.log(metric);
   }
 }
 
