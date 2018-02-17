@@ -148,13 +148,10 @@ export class AnalyticsService {
   }
 
   private saveMetric(metric: any) {
-    /*
     this
       .server
       .indexDocument(metric)
       .subscribe(() => {},(error) => console.log(error));
-      */
-    console.log(metric);
   }
 }
 
