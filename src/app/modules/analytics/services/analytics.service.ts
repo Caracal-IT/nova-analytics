@@ -2,13 +2,14 @@ import {Injectable} from "@angular/core";
 import {AnalyticsClient} from "../clients/analytics.client";
 import {SpatialClient} from "../clients/spatial.client";
 import {GeoLocation} from "../models/spatial/geo-location.type";
+import {EventService} from "./event.service";
 
 @Injectable()
 export class AnalyticsService {
-  private static registeredEvents: any = [];
   private readonly sessionId: string;
 
   constructor(
+    private events: EventService,
     private server: AnalyticsClient,
     private spatialClient: SpatialClient
   ){
@@ -17,13 +18,10 @@ export class AnalyticsService {
     this.registerEvents();
   }
 
-  static addEvents(events: any){
-    events.forEach((event: any) => AnalyticsService.registeredEvents.push(event));
-  }
-
   registerEvents(){
-    for (let evt of AnalyticsService.registeredEvents)
-      window.addEventListener(evt.key, (event) => this.logEvent(event, evt), this.isGlobalEvent(evt));
+    this.events.getEvents().forEach(evt =>
+      window.addEventListener(evt.key, (event) => this.logEvent(event, evt), this.isGlobalEvent(evt))
+    );
   }
 
   private isGlobalEvent(event: any): boolean {
