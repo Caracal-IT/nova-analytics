@@ -11,10 +11,10 @@ export class AnalyticsModule {
   public static forRoot(
     providedAnalyticsClient: Provider,
     providedSpatialClient: Provider,
-    ...configs: Array<any>
+    getComponentConfig: any
   ): ModuleWithProviders {
 
-    for(let config of configs)
+    for(let config of getComponentConfig())
       AnalyticsService.addEvents(config.getEvents());
 
     return {
